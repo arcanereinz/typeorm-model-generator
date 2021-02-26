@@ -175,6 +175,11 @@ export default abstract class AbstractDriver {
             connectionOptions.schemaNames,
             connectionOptions.databaseNames
         );
+        dbModel.forEach(
+            (model) =>
+                (model.generateTransformer =
+                    generationOptions.generateTransformer)
+        );
         await this.GetCoulmnsFromEntity(
             dbModel,
             connectionOptions.schemaNames,

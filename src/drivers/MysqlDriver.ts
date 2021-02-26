@@ -113,6 +113,12 @@ export default class MysqlDriver extends AbstractDriver {
                         resp.COLUMN_DEFAULT,
                         resp.DATA_TYPE
                     );
+                    let booleanTransformer;
+                    if (ent.generateTransformer) {
+                        booleanTransformer = MysqlDriver.ReturnBooleanTransformer(
+                            resp.COLUMN_TYPE
+                        );
+                    }
                     let columnType = resp.DATA_TYPE;
                     if (resp.IS_NULLABLE === "YES") options.nullable = true;
                     if (resp.COLUMN_KEY === "UNI") options.unique = true;
@@ -132,7 +138,10 @@ export default class MysqlDriver extends AbstractDriver {
                             }
                             break;
                         case "tinyint":
-                            if (resp.COLUMN_TYPE === "tinyint(1)") {
+                            if (
+                                resp.COLUMN_TYPE === "tinyint(1)" ||
+                                resp.COLUMN_TYPE === "tinyint(1) unsigned"
+                            ) {
                                 options.width = 1;
                                 tscType = "boolean";
                             } else {
@@ -307,6 +316,7 @@ export default class MysqlDriver extends AbstractDriver {
                         generated,
                         type: columnType,
                         default: defaultValue,
+                        transformer: booleanTransformer,
                         options,
                         tscName,
                         tscType,
@@ -567,5 +577,17 @@ export default class MysqlDriver extends AbstractDriver {
         }
 
         return `() => "'${defaultValue}'"`;
+    }
+
+    private static ReturnBooleanTransformer(
+        columnType: string
+    ): string | undefined {
+        if (
+            columnType === "tinyint(1)" ||
+            columnType === "tinyint(1) unsigned"
+        ) {
+            return `{ from: (value: number) => value === 1, to: (value: boolean) => (value ? 1 : 0) }`;
+        }
+        return undefined;
     }
 }

@@ -241,6 +241,9 @@ function addImportsAndGenerationOptions(
         if (generationOptions.generateConstructor) {
             entity.generateConstructor = true;
         }
+        if (generationOptions.generateTransformer) {
+            entity.generateTransformer = true;
+        }
     });
     return dbModel;
 }

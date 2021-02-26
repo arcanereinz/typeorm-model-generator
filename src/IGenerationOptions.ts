@@ -17,6 +17,7 @@ export default interface IGenerationOptions {
     lazy: boolean;
     activeRecord: boolean;
     generateConstructor: boolean;
+    generateTransformer?: boolean;
     customNamingStrategyPath: string;
     relationIds: boolean;
     strictMode: "none" | "?" | "!";
@@ -43,6 +44,7 @@ export function getDefaultGenerationOptions(): IGenerationOptions {
         lazy: false,
         activeRecord: false,
         generateConstructor: false,
+        generateTransformer: false,
         customNamingStrategyPath: "",
         relationIds: false,
         strictMode: "none",

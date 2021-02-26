@@ -10,6 +10,8 @@ export type Column = {
     primary?: boolean;
     generated?: true | "increment" | "uuid";
     default?: string; // ?
+    // convert between: bool <=> tinyint(1) <signed|unsigned>
+    transformer?: string; // content-type: ValueTransformer | ValueTransformer[];
     options: {
         name: string;
         length?: number;

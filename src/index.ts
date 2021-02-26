@@ -264,6 +264,12 @@ function checkYargsParameters(options: options): options {
             default: options.generationOptions.generateConstructor,
             describe: "Generate constructor allowing partial initialization",
         },
+        generateTransformer: {
+            boolean: true,
+            default: options.generationOptions.generateTransformer,
+            describe:
+                "Generate transformer that converts boolean <=> tinyint(1) <signed|usigned>",
+        },
         disablePluralization: {
             boolean: true,
             default: !options.generationOptions.pluralizeNames,
@@ -326,6 +332,7 @@ function checkYargsParameters(options: options): options {
     options.connectionOptions.onlyTables = tables;
     options.generationOptions.activeRecord = argv.a;
     options.generationOptions.generateConstructor = argv.generateConstructor;
+    options.generationOptions.generateTransformer = argv.generateTransformer;
     options.generationOptions.convertCaseEntity = argv.ce as IGenerationOptions["convertCaseEntity"];
     options.generationOptions.convertCaseFile = argv.cf as IGenerationOptions["convertCaseFile"];
     options.generationOptions.convertCaseProperty = argv.cp as IGenerationOptions["convertCaseProperty"];
@@ -578,6 +585,13 @@ async function useInquirer(options: options): Promise<options> {
                                 options.generationOptions.generateConstructor,
                         },
                         {
+                            name:
+                                "Generate transformer that converts boolean <=> tinyint(1) <signed|unsigned>",
+                            value: "transformer",
+                            checked:
+                                options.generationOptions.generateTransformer,
+                        },
+                        {
                             name: "Use specific naming convention",
                             value: "namingConvention",
                             checked:
@@ -663,6 +677,9 @@ async function useInquirer(options: options): Promise<options> {
         );
         options.generationOptions.generateConstructor = customizations.includes(
             "constructor"
+        );
+        options.generationOptions.generateTransformer = customizations.includes(
+            "transformer"
         );
         options.generationOptions.indexFile = customizations.includes("index");
         options.generationOptions.exportType = customizations.includes(

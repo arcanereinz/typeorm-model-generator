@@ -22,4 +22,5 @@ export type Entity = {
     }[];
     activeRecord?: true;
     generateConstructor?: true;
+    generateTransformer?: boolean;
 };
