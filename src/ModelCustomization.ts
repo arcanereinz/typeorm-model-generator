@@ -241,8 +241,11 @@ function addImportsAndGenerationOptions(
         if (generationOptions.generateConstructor) {
             entity.generateConstructor = true;
         }
-        if (generationOptions.generateTransformer) {
-            entity.generateTransformer = true;
+        if (generationOptions.generateTinyintTransformer) {
+            entity.generateTinyintTransformer = true;
+        }
+        if (generationOptions.generateBigintTransformer) {
+            entity.generateBigintTransformer = true;
         }
     });
     return dbModel;

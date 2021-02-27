@@ -22,8 +22,15 @@ Supported db engines:
 
 **2021-02-26:**
 
-- maps `tinyint(1) unsgined` to boolean
-- added `--generateTransformer` to convert tinyint(1) <=> boolean when reading and writing to the database
+- added `--generateTinyintTransformer` to convert tinyint(1) <=> boolean when reading and writing to the database
+- also maps `tinyint(1) <signed|unsigned>` to boolean
+
+- added `--generateBigintTransformer` to convert bigint <=> number when reading and writing to the database
+- also map `bigint <signed|unsigned> to number`
+
+- **WARNING:** Use `--generateBigintTransformer` with caution since this can cause 32-bit/53-bit overflows when coverting to/from 64-bit integers. 
+
+- **NOTE:** TypeORM tranformers cannot be used on auto-increment columns therefore it is not generated for identity columns.
 
 ### Versions
 Typeorm-model-generator comes with preinstalled driver for each supported db(except for oracle). However if you want to use it as a dev-dependency you may want to install your db driver manually to reduce dependency footprint, reduce time spent in the CI. In such case you can use version without preinstalled db drivers - `npm i typeorm-model-generator@no-engines`.  
@@ -76,8 +83,13 @@ Options:
       --relationIds                Generate RelationId fields                          [boolean] [default: false]
       --skipSchema                 Omits schema identifier in generated entities       [boolean] [default: false]
       --generateConstructor        Generate constructor allowing partial initialization[boolean] [default: false]
-      --generateTransformer        Generate transformer that converts
-                                    boolean <=> tinyint(1) <signed|usigned>            [boolean] [default: false]
+      --generateTinyintTransformer (ONLY MySQL - for now) Generate transformer that
+                                   converts boolean <=> tinyint(1) <signed|usigned>.
+                                   Cannot be used on auto-increment columns.            [boolean] [default: false]
+      --generateBigintTransformer  (ONLY MySQL - for now) Generate transformer that
+                                   converts string <=> bigint <signed|usigned>.
+                                   Use with caution since this can cause interger
+                                   overflows. Cannot be used on auto-increment columns. [boolean] [default: false]
       --disablePluralization       Disable pluralization of OneToMany,
                                    ManyToMany relation names                           [boolean] [default: false]
       --skipTables                 Skip schema generation for specific tables.

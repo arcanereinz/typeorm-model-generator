@@ -264,11 +264,17 @@ function checkYargsParameters(options: options): options {
             default: options.generationOptions.generateConstructor,
             describe: "Generate constructor allowing partial initialization",
         },
-        generateTransformer: {
+        generateTinyintTransformer: {
             boolean: true,
-            default: options.generationOptions.generateTransformer,
+            default: options.generationOptions.generateTinyintTransformer,
             describe:
                 "Generate transformer that converts boolean <=> tinyint(1) <signed|usigned>",
+        },
+        generateBigintTransformer: {
+            boolean: true,
+            default: options.generationOptions.generateBigintTransformer,
+            describe:
+                "Generate transformer that converts number <=> bigint <signed|usigned>",
         },
         disablePluralization: {
             boolean: true,
@@ -332,7 +338,10 @@ function checkYargsParameters(options: options): options {
     options.connectionOptions.onlyTables = tables;
     options.generationOptions.activeRecord = argv.a;
     options.generationOptions.generateConstructor = argv.generateConstructor;
-    options.generationOptions.generateTransformer = argv.generateTransformer;
+    options.generationOptions.generateTinyintTransformer =
+        argv.generateTinyintTransformer;
+    options.generationOptions.generateBigintTransformer =
+        argv.generateBigintTransformer;
     options.generationOptions.convertCaseEntity = argv.ce as IGenerationOptions["convertCaseEntity"];
     options.generationOptions.convertCaseFile = argv.cf as IGenerationOptions["convertCaseFile"];
     options.generationOptions.convertCaseProperty = argv.cp as IGenerationOptions["convertCaseProperty"];
@@ -587,9 +596,18 @@ async function useInquirer(options: options): Promise<options> {
                         {
                             name:
                                 "Generate transformer that converts boolean <=> tinyint(1) <signed|unsigned>",
-                            value: "transformer",
+                            value: "tinyintTransformer",
                             checked:
-                                options.generationOptions.generateTransformer,
+                                options.generationOptions
+                                    .generateTinyintTransformer,
+                        },
+                        {
+                            name:
+                                "Generate transformer that converts number <=> bigint <signed|unsigned>",
+                            value: "bigintTransformer",
+                            checked:
+                                options.generationOptions
+                                    .generateBigintTransformer,
                         },
                         {
                             name: "Use specific naming convention",
@@ -678,8 +696,11 @@ async function useInquirer(options: options): Promise<options> {
         options.generationOptions.generateConstructor = customizations.includes(
             "constructor"
         );
-        options.generationOptions.generateTransformer = customizations.includes(
-            "transformer"
+        options.generationOptions.generateTinyintTransformer = customizations.includes(
+            "tinyintTransformer"
+        );
+        options.generationOptions.generateBigintTransformer = customizations.includes(
+            "bigintTransformer"
         );
         options.generationOptions.indexFile = customizations.includes("index");
         options.generationOptions.exportType = customizations.includes(

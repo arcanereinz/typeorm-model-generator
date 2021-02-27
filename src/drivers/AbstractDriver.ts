@@ -175,11 +175,13 @@ export default abstract class AbstractDriver {
             connectionOptions.schemaNames,
             connectionOptions.databaseNames
         );
-        dbModel.forEach(
-            (model) =>
-                (model.generateTransformer =
-                    generationOptions.generateTransformer)
-        );
+        // copy over options from prompt to entity generator
+        dbModel.forEach((model) => {
+            model.generateTinyintTransformer =
+                generationOptions.generateTinyintTransformer;
+            model.generateBigintTransformer =
+                generationOptions.generateBigintTransformer;
+        });
         await this.GetCoulmnsFromEntity(
             dbModel,
             connectionOptions.schemaNames,

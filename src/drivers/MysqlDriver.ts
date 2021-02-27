@@ -113,10 +113,15 @@ export default class MysqlDriver extends AbstractDriver {
                         resp.COLUMN_DEFAULT,
                         resp.DATA_TYPE
                     );
-                    let booleanTransformer;
-                    if (ent.generateTransformer) {
-                        booleanTransformer = MysqlDriver.ReturnBooleanTransformer(
-                            resp.COLUMN_TYPE
+                    let transformer;
+
+                    // cannot add tranformer on auto-increment column
+                    if (!generated) {
+                        transformer = MysqlDriver.ReturnDatatypeTransformer(
+                            resp.DATA_TYPE,
+                            resp.COLUMN_TYPE,
+                            ent.generateTinyintTransformer,
+                            ent.generateBigintTransformer
                         );
                     }
                     let columnType = resp.DATA_TYPE;
@@ -139,8 +144,10 @@ export default class MysqlDriver extends AbstractDriver {
                             break;
                         case "tinyint":
                             if (
-                                resp.COLUMN_TYPE === "tinyint(1)" ||
-                                resp.COLUMN_TYPE === "tinyint(1) unsigned"
+                                !generated && // generated columns do not support transforms
+                                ent.generateTinyintTransformer &&
+                                (resp.COLUMN_TYPE === "tinyint(1)" ||
+                                    resp.COLUMN_TYPE === "tinyint(1) unsigned")
                             ) {
                                 options.width = 1;
                                 tscType = "boolean";
@@ -155,7 +162,12 @@ export default class MysqlDriver extends AbstractDriver {
                             tscType = "number";
                             break;
                         case "bigint":
-                            tscType = "string";
+                            // generated columns do not support transforms
+                            if (!generated && ent.generateBigintTransformer) {
+                                tscType = "number";
+                            } else {
+                                tscType = "string";
+                            }
                             break;
                         case "float":
                             tscType = "number";
@@ -316,7 +328,7 @@ export default class MysqlDriver extends AbstractDriver {
                         generated,
                         type: columnType,
                         default: defaultValue,
-                        transformer: booleanTransformer,
+                        transformer,
                         options,
                         tscName,
                         tscType,
@@ -579,14 +591,23 @@ export default class MysqlDriver extends AbstractDriver {
         return `() => "'${defaultValue}'"`;
     }
 
-    private static ReturnBooleanTransformer(
-        columnType: string
+    private static ReturnDatatypeTransformer(
+        dataType: string,
+        columnType: string,
+        generateTinyintTransformer?: boolean,
+        generateBigintTransformer?: boolean
     ): string | undefined {
         if (
-            columnType === "tinyint(1)" ||
-            columnType === "tinyint(1) unsigned"
+            generateTinyintTransformer &&
+            (columnType === "tinyint(1)" ||
+                columnType === "tinyint(1) unsigned")
         ) {
-            return `{ from: (value: number) => value === 1, to: (value: boolean) => (value ? 1 : 0) }`;
+            // do not transform null or undefined
+            return `{ from: (value: number) => value === null || value === undefined ? value : Boolean(value), to: (value: boolean) => value === null || value === undefined ? value : Number(value) }`;
+        } else if (generateBigintTransformer && dataType === "bigint") {
+            // do not transform null or undefined
+            // watch out for 32-bit int overflow if using this option
+            return `{ from: (value: string) => value === null || value === undefined ? value : Number(value), to: (value: number) => value === null || value === undefined ? value : String(value) }`;
         }
         return undefined;
     }
