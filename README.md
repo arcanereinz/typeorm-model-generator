@@ -78,18 +78,21 @@ Options:
       --pv, --property-visibility  Defines which visibility should have
                                    the generated property                              [choices: "public", "protected", "private", "none"] [default: "none"]
       --lazy                       Generate lazy relations                             [boolean] [default: false]
+      --cascade                    (ONLY MySQL) Generate cascade relations
+                                   (eg. --cascade true) (eg. --cascade
+                                   'insert, update, remove, soft-remove, recover')     [boolean] [default: false]
   -a, --active-record              Use ActiveRecord syntax for generated models        [boolean] [default: false]
       --namingStrategy             Use custom naming strategy                          [string] [default: ""]
       --relationIds                Generate RelationId fields                          [boolean] [default: false]
       --skipSchema                 Omits schema identifier in generated entities       [boolean] [default: false]
       --generateConstructor        Generate constructor allowing partial initialization[boolean] [default: false]
-      --generateTinyintTransformer (ONLY MySQL - for now) Generate transformer that
-                                   converts boolean <=> tinyint(1) <signed|usigned>.
-                                   Cannot be used on auto-increment columns.            [boolean] [default: false]
-      --generateBigintTransformer  (ONLY MySQL - for now) Generate transformer that
-                                   converts string <=> bigint <signed|usigned>.
-                                   Use with caution since this can cause interger
-                                   overflows. Cannot be used on auto-increment columns. [boolean] [default: false]
+      --generateTinyintTransformer (ONLY MySQL) Generate transformer that
+                                   converts boolean <=> tinyint(1) <signed|usigned>.   [boolean] [default: false]
+      --generateBigintTransformer  (ONLY MySQL - NOT FOR AUTO-INCREMENT) Generate
+                                   transformer that converts number <=> bigint
+                                   <signed|unsigned>. Use with caution since this can
+                                   cause interger overflows. Typeorm does not support
+                                   transformers on auto-increment columns.             [boolean] [default: false]
       --disablePluralization       Disable pluralization of OneToMany,
                                    ManyToMany relation names                           [boolean] [default: false]
       --skipTables                 Skip schema generation for specific tables.

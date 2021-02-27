@@ -15,6 +15,7 @@ export default interface IGenerationOptions {
     convertEol: "LF" | "CRLF";
     propertyVisibility: "public" | "protected" | "private" | "none";
     lazy: boolean;
+    cascade: boolean | string;
     activeRecord: boolean;
     generateConstructor: boolean;
     generateTinyintTransformer?: boolean;
@@ -43,6 +44,7 @@ export function getDefaultGenerationOptions(): IGenerationOptions {
         convertEol: EOL === "\n" ? "LF" : "CRLF",
         propertyVisibility: "none",
         lazy: false,
+        cascade: false,
         activeRecord: false,
         generateConstructor: false,
         generateTinyintTransformer: false,

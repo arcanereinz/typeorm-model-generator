@@ -238,6 +238,12 @@ function checkYargsParameters(options: options): options {
             default: options.generationOptions.lazy,
             describe: "Generate lazy relations",
         },
+        cascade: {
+            describe:
+                "(ONLY MySQL) Generate cascade relations (eg. --cascade true) (eg. --cascade 'insert, update, remove, soft-remove, recover')",
+            default: options.generationOptions.cascade,
+            string: true,
+        },
         a: {
             alias: "active-record",
             boolean: true,
@@ -268,13 +274,13 @@ function checkYargsParameters(options: options): options {
             boolean: true,
             default: options.generationOptions.generateTinyintTransformer,
             describe:
-                "Generate transformer that converts boolean <=> tinyint(1) <signed|usigned>",
+                "(ONLY MySQL) Generate transformer that converts boolean <=> tinyint(1) <signed|usigned>",
         },
         generateBigintTransformer: {
             boolean: true,
             default: options.generationOptions.generateBigintTransformer,
             describe:
-                "Generate transformer that converts number <=> bigint <signed|usigned>",
+                "(ONLY MySQL - NOT FOR AUTO-INCREMENT) Generate transformer that converts number <=> bigint <signed|usigned>. Use with caution since this can cause interger overflows. Typeorm does not support transformers on auto-increment columns.",
         },
         disablePluralization: {
             boolean: true,
@@ -347,6 +353,7 @@ function checkYargsParameters(options: options): options {
     options.generationOptions.convertCaseProperty = argv.cp as IGenerationOptions["convertCaseProperty"];
     options.generationOptions.convertEol = argv.eol as IGenerationOptions["convertEol"];
     options.generationOptions.lazy = argv.lazy;
+    options.generationOptions.cascade = argv.cascade;
     options.generationOptions.customNamingStrategyPath = argv.namingStrategy;
     options.generationOptions.noConfigs = argv.noConfig;
     options.generationOptions.propertyVisibility = argv.pv as IGenerationOptions["propertyVisibility"];
@@ -564,6 +571,11 @@ async function useInquirer(options: options): Promise<options> {
                             checked: options.generationOptions.lazy,
                         },
                         {
+                            name: "Generate cascade relations",
+                            value: "cascade",
+                            checked: options.generationOptions.cascade,
+                        },
+                        {
                             name:
                                 "Use ActiveRecord syntax for generated models",
                             value: "activeRecord",
@@ -684,6 +696,7 @@ async function useInquirer(options: options): Promise<options> {
             "pluralize"
         );
         options.generationOptions.lazy = customizations.includes("lazy");
+        options.generationOptions.cascade = customizations.includes("cascade");
         options.generationOptions.activeRecord = customizations.includes(
             "activeRecord"
         );

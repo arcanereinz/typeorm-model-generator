@@ -5,6 +5,11 @@ import IGenerationOptions from "./IGenerationOptions";
 import * as NamingStrategy from "./NamingStrategy";
 import * as TomgUtils from "./Utils";
 
+type cascadeOptions =
+    | boolean
+    | ("insert" | "update" | "remove" | "soft-remove" | "recover")[]
+    | undefined;
+
 export default function modelCustomizationPhase(
     dbModel: Entity[],
     generationOptions: IGenerationOptions,
@@ -229,6 +234,23 @@ function addImportsAndGenerationOptions(
                     relation.relationOptions = {};
                 }
                 relation.relationOptions.lazy = true;
+            }
+            if (
+                generationOptions.cascade &&
+                generationOptions.cascade !== "false" &&
+                relation.relationType === "OneToMany"
+            ) {
+                if (!relation.relationOptions) {
+                    relation.relationOptions = {};
+                }
+                if (generationOptions.cascade === "true") {
+                    relation.relationOptions.cascade = true;
+                } else {
+                    relation.relationOptions.cascade = generationOptions.cascade
+                        .toString()
+                        .split(",")
+                        .map((option) => option.trim()) as cascadeOptions;
+                }
             }
         });
         if (generationOptions.skipSchema) {
