@@ -288,6 +288,12 @@ function checkYargsParameters(options: options): options {
             describe:
                 "(ONLY MySQL) Generate class-validator constraints based on column properties",
         },
+        smartStrictMode: {
+            boolean: true,
+            default: options.generationOptions.smartStrictMode,
+            describe:
+                "(ONLY MySQL) Add optional chaining (?.) to property type that are nullable or has default or is auto-increment or foreign key",
+        },
         disablePluralization: {
             boolean: true,
             default: !options.generationOptions.pluralizeNames,
@@ -355,6 +361,7 @@ function checkYargsParameters(options: options): options {
     options.generationOptions.generateBigintTransformer =
         argv.generateBigintTransformer;
     options.generationOptions.generateValidators = argv.generateValidators;
+    options.generationOptions.smartStrictMode = argv.smartStrictMode;
     options.generationOptions.convertCaseEntity = argv.ce as IGenerationOptions["convertCaseEntity"];
     options.generationOptions.convertCaseFile = argv.cf as IGenerationOptions["convertCaseFile"];
     options.generationOptions.convertCaseProperty = argv.cp as IGenerationOptions["convertCaseProperty"];
@@ -636,6 +643,12 @@ async function useInquirer(options: options): Promise<options> {
                                 options.generationOptions.generateValidators,
                         },
                         {
+                            name:
+                                "Add optional chaining (?.) to property type that are nullable or has default or is auto-increment or foreign key",
+                            value: "smartStrictMode",
+                            checked: options.generationOptions.smartStrictMode,
+                        },
+                        {
                             name: "Use specific naming convention",
                             value: "namingConvention",
                             checked:
@@ -731,6 +744,9 @@ async function useInquirer(options: options): Promise<options> {
         );
         options.generationOptions.generateValidators = customizations.includes(
             "constraints"
+        );
+        options.generationOptions.smartStrictMode = customizations.includes(
+            "smartStrictMode"
         );
         options.generationOptions.indexFile = customizations.includes("index");
         options.generationOptions.exportType = customizations.includes(

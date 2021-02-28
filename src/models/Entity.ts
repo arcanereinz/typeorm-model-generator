@@ -26,4 +26,5 @@ export type Entity = {
     generateBigintTransformer?: boolean;
     generateValidators?: boolean; // handles duplicate imports
     classValidators?: Record<string, boolean>;
+    smartStrictMode?: boolean;
 };

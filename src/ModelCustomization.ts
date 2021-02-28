@@ -272,6 +272,9 @@ function addImportsAndGenerationOptions(
         if (generationOptions.generateValidators) {
             entity.generateValidators = true;
         }
+        if (generationOptions.smartStrictMode) {
+            entity.smartStrictMode = true;
+        }
     });
     return dbModel;
 }

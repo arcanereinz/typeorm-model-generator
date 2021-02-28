@@ -182,6 +182,7 @@ export default abstract class AbstractDriver {
             model.generateBigintTransformer =
                 generationOptions.generateBigintTransformer;
             model.generateValidators = generationOptions.generateValidators;
+            model.smartStrictMode = generationOptions.smartStrictMode;
         });
         await this.GetCoulmnsFromEntity(
             dbModel,

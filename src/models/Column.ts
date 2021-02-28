@@ -13,6 +13,7 @@ export type Column = {
     // convert between: bool <=> tinyint(1) <signed|unsigned>
     transformer?: string; // content-type: ValueTransformer | ValueTransformer[];
     constraints?: string[];
+    chainingSymbol?: string; // controls if we should '?.' or '.' based on column properties
     options: {
         name: string;
         length?: number;

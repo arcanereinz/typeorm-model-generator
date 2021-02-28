@@ -28,6 +28,12 @@ Supported db engines:
 - added `--generateBigintTransformer` to convert bigint <=> number when reading and writing to the database
 - also map `bigint <signed|unsigned> to number`
 
+- added `--cascade` to add cascade option to property definitions based on user input
+
+- added `--generateValidators` to add class-validator constraints to property definitions based on column properties
+
+- added `--smartStrictMode` to add optional chaining (?.) to property type that are nullable or has default or is auto-increment or foreign key
+
 - **WARNING:** Use `--generateBigintTransformer` with caution since this can cause 32-bit/53-bit overflows when coverting to/from 64-bit integers. 
 
 - **NOTE:** TypeORM tranformers cannot be used on auto-increment columns therefore it is not generated for identity columns.
@@ -95,6 +101,9 @@ Options:
                                    transformers on auto-increment columns.             [boolean] [default: false]
       --generateValidators         (ONLY MySQL) Generate class-validator constraints
                                    based on column properties.                         [boolean] [default: false]
+      --smartStrictMode            add optional chaining to property type that are 
+                                   nullable or has default or is auto-increment or
+                                   foreign key                                         [boolean] [default: false]
       --disablePluralization       Disable pluralization of OneToMany,
                                    ManyToMany relation names                           [boolean] [default: false]
       --skipTables                 Skip schema generation for specific tables.

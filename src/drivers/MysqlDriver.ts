@@ -92,13 +92,31 @@ export default class MysqlDriver extends AbstractDriver {
             COLUMN_TYPE: string;
             COLUMN_KEY: string;
             COLUMN_COMMENT: string;
-        }>(`SELECT TABLE_NAME,COLUMN_NAME,COLUMN_DEFAULT,IS_NULLABLE,
-            DATA_TYPE,CHARACTER_MAXIMUM_LENGTH,NUMERIC_PRECISION,NUMERIC_SCALE,
-            CASE WHEN EXTRA like '%auto_increment%' THEN 1 ELSE 0 END IsIdentity, COLUMN_TYPE, COLUMN_KEY, COLUMN_COMMENT
-            FROM INFORMATION_SCHEMA.COLUMNS where TABLE_SCHEMA IN (${MysqlDriver.buildEscapedObjectList(
+            REFERENCED_TABLE_NAME: string;
+        }>(`SELECT  C.TABLE_NAME,
+                    C.COLUMN_NAME,
+                    C.COLUMN_DEFAULT,
+                    C.IS_NULLABLE,
+                    C.DATA_TYPE,
+                    C.CHARACTER_MAXIMUM_LENGTH,
+                    C.NUMERIC_PRECISION,
+                    C.NUMERIC_SCALE,
+                    CASE WHEN C.EXTRA like '%auto_increment%' THEN 1 ELSE 0 END IsIdentity,
+                    C.COLUMN_TYPE,
+                    C.COLUMN_KEY,
+                    C.COLUMN_COMMENT,
+                    KCU.REFERENCED_TABLE_NAME
+            FROM INFORMATION_SCHEMA.COLUMNS C
+            LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE KCU
+              ON C.TABLE_NAME = KCU.TABLE_NAME
+             AND C.COLUMN_NAME = KCU.COLUMN_NAME
+             AND C.TABLE_SCHEMA = KCU.TABLE_SCHEMA
+             AND KCU.REFERENCED_TABLE_NAME is not null
+             AND KCU.REFERENCED_COLUMN_NAME is not null
+            WHERE C.TABLE_SCHEMA IN (${MysqlDriver.buildEscapedObjectList(
                 dbNames
             )})
-			order by ordinal_position`);
+			ORDER BY C.ORDINAL_POSITION`);
         entities.forEach((ent) => {
             response
                 .filter((filterVal) => filterVal.TABLE_NAME === ent.tscName)
@@ -334,16 +352,15 @@ export default class MysqlDriver extends AbstractDriver {
                     const classValidators = {}; // initialize calssValidatorImport
                     const isNullable =
                         resp.IS_NULLABLE === "YES" ? true : false;
+                    // add optional chaining (?.) if column nullable or has default or is auto-increment or foreign key or foreign key
+                    const chainingSymbol =
+                        isNullable ||
+                        resp.COLUMN_DEFAULT !== null ||
+                        generated ||
+                        resp.REFERENCED_TABLE_NAME
+                            ? "?"
+                            : "";
 
-                    // enforce required values if no default specified and not auto-increment
-                    if (
-                        !isNullable &&
-                        resp.COLUMN_DEFAULT === null &&
-                        !generated
-                    ) {
-                        classValidators["IsNotEmpty"] = "true";
-                        constraints.push("@IsNotEmpty()");
-                    }
                     // enforce varchar max lengths
                     if (
                         resp.DATA_TYPE === "varchar" &&
@@ -353,6 +370,20 @@ export default class MysqlDriver extends AbstractDriver {
                         constraints.push(
                             `@MaxLength(${resp.CHARACTER_MAXIMUM_LENGTH})`
                         );
+                    }
+                    // enforce number on numbers 32-bits or less
+                    if (
+                        resp.DATA_TYPE === "int" ||
+                        resp.DATA_TYPE === "smallint" ||
+                        (resp.DATA_TYPE === "tinyint" && options.width !== 1) // not boolean
+                    ) {
+                        classValidators["IsNumber"] = "true";
+                        constraints.push("@IsNumber()");
+                    }
+                    // enforce number on 64-bit numbers represented as string in Javascript
+                    if (resp.DATA_TYPE === "bigint") {
+                        classValidators["IsNumberString"] = "true";
+                        constraints.push("@IsNumberString()");
                     }
                     // pull enum values and add to constraints
                     if (resp.DATA_TYPE === "enum") {
@@ -364,8 +395,13 @@ export default class MysqlDriver extends AbstractDriver {
                             )}])`
                         );
                     }
-                    // add optional flag if there is any constraints and the column is nullable
-                    if (isNullable && constraints.length) {
+                    // if column value is required
+                    if (!chainingSymbol) {
+                        classValidators["IsNotEmpty"] = "true";
+                        constraints.push("@IsNotEmpty()");
+                    }
+                    // add optional flag if there is any constraints and the column value is not required
+                    if (chainingSymbol && constraints.length) {
                         classValidators["IsOptional"] = "true";
                         constraints.push("@IsOptional()");
                     }
@@ -387,6 +423,7 @@ export default class MysqlDriver extends AbstractDriver {
                         tscName,
                         tscType,
                         constraints, // add constraints based on constraints
+                        chainingSymbol,
                     });
                 });
         });
