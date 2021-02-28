@@ -294,6 +294,12 @@ function checkYargsParameters(options: options): options {
             describe:
                 "(ONLY MySQL) Add optional chaining (?.) to property type that are nullable or has default or is auto-increment or foreign key",
         },
+        noTypeorm: {
+            boolean: true,
+            default: options.generationOptions.noTypeorm,
+            describe:
+                "(ONLY MySQL) Do not include typeorm imports and decorators when writing out typescript files. For use with --generateValidators",
+        },
         disablePluralization: {
             boolean: true,
             default: !options.generationOptions.pluralizeNames,
@@ -362,6 +368,7 @@ function checkYargsParameters(options: options): options {
         argv.generateBigintTransformer;
     options.generationOptions.generateValidators = argv.generateValidators;
     options.generationOptions.smartStrictMode = argv.smartStrictMode;
+    options.generationOptions.noTypeorm = argv.noTypeorm;
     options.generationOptions.convertCaseEntity = argv.ce as IGenerationOptions["convertCaseEntity"];
     options.generationOptions.convertCaseFile = argv.cf as IGenerationOptions["convertCaseFile"];
     options.generationOptions.convertCaseProperty = argv.cp as IGenerationOptions["convertCaseProperty"];
@@ -649,6 +656,12 @@ async function useInquirer(options: options): Promise<options> {
                             checked: options.generationOptions.smartStrictMode,
                         },
                         {
+                            name:
+                                "Do not include typeorm imports and decorators when writing out typescript files. For use with --generateValidators",
+                            value: "noTypeorm",
+                            checked: options.generationOptions.noTypeorm,
+                        },
+                        {
                             name: "Use specific naming convention",
                             value: "namingConvention",
                             checked:
@@ -747,6 +760,9 @@ async function useInquirer(options: options): Promise<options> {
         );
         options.generationOptions.smartStrictMode = customizations.includes(
             "smartStrictMode"
+        );
+        options.generationOptions.noTypeorm = customizations.includes(
+            "noTypeorm"
         );
         options.generationOptions.indexFile = customizations.includes("index");
         options.generationOptions.exportType = customizations.includes(

@@ -263,6 +263,10 @@ function addImportsAndGenerationOptions(
         if (generationOptions.generateConstructor) {
             entity.generateConstructor = true;
         }
+        // only needed for entity.mst options lookup
+        if (generationOptions.cascade) {
+            entity.cascade = generationOptions.cascade;
+        }
         if (generationOptions.generateTinyintTransformer) {
             entity.generateTinyintTransformer = true;
         }
@@ -274,6 +278,9 @@ function addImportsAndGenerationOptions(
         }
         if (generationOptions.smartStrictMode) {
             entity.smartStrictMode = true;
+        }
+        if (generationOptions.noTypeorm) {
+            entity.noTypeorm = true;
         }
     });
     return dbModel;

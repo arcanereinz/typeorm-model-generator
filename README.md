@@ -20,19 +20,21 @@ Supported db engines:
 
 ### Changelog
 
-**2021-02-26:**
+**2021-02-28:**
 
-- added `--generateTinyintTransformer` to convert tinyint(1) <=> boolean when reading and writing to the database
-- also maps `tinyint(1) <signed|unsigned>` to boolean
+- added `--generateTinyintTransformer` to convert tinyint(1) <=> boolean when reading and writing to the database and also maps `tinyint(1) <signed|unsigned>` to boolean
 
-- added `--generateBigintTransformer` to convert bigint <=> number when reading and writing to the database
-- also map `bigint <signed|unsigned> to number`
+- added `--generateBigintTransformer` to convert bigint <=> number when reading and writing to the database and also map `bigint <signed|unsigned>` to number
 
 - added `--cascade` to add cascade option to property definitions based on user input
 
 - added `--generateValidators` to add class-validator constraints to property definitions based on column properties
 
 - added `--smartStrictMode` to add optional chaining (?.) to property type that are nullable or has default or is auto-increment or foreign key
+
+- added `--noTypeorm` suppress typeorm imports and decorators. for use with `--generateValidators`
+
+- added comment at top of class that shows source schema.table_name and options for generating classes
 
 - **WARNING:** Use `--generateBigintTransformer` with caution since this can cause 32-bit/53-bit overflows when coverting to/from 64-bit integers. 
 
@@ -101,9 +103,12 @@ Options:
                                    transformers on auto-increment columns.             [boolean] [default: false]
       --generateValidators         (ONLY MySQL) Generate class-validator constraints
                                    based on column properties.                         [boolean] [default: false]
-      --smartStrictMode            add optional chaining to property type that are 
-                                   nullable or has default or is auto-increment or
+      --smartStrictMode            (ONLY MySQL) add optional chaining to property type
+                                   if nullable or has default or is auto-increment or
                                    foreign key                                         [boolean] [default: false]
+      --noTypeorm                  (ONLY MySQL) Do not include typeorm imports and
+                                   decorators when writing out typescript files.
+                                   For use with --generateValidators                   [boolean] [default: false]
       --disablePluralization       Disable pluralization of OneToMany,
                                    ManyToMany relation names                           [boolean] [default: false]
       --skipTables                 Skip schema generation for specific tables.

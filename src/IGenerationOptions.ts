@@ -22,6 +22,7 @@ export default interface IGenerationOptions {
     generateBigintTransformer?: boolean;
     generateValidators?: boolean;
     smartStrictMode?: boolean;
+    noTypeorm?: boolean;
     customNamingStrategyPath: string;
     relationIds: boolean;
     strictMode: "none" | "?" | "!";
@@ -53,6 +54,7 @@ export function getDefaultGenerationOptions(): IGenerationOptions {
         generateBigintTransformer: false,
         generateValidators: false,
         smartStrictMode: false,
+        noTypeorm: false,
         customNamingStrategyPath: "",
         relationIds: false,
         strictMode: "none",

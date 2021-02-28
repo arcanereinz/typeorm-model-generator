@@ -22,9 +22,11 @@ export type Entity = {
     }[];
     activeRecord?: true;
     generateConstructor?: true;
+    cascade?: string | boolean; // only needed for entity.mst options lookup
     generateTinyintTransformer?: boolean;
     generateBigintTransformer?: boolean;
     generateValidators?: boolean; // handles duplicate imports
     classValidators?: Record<string, boolean>;
     smartStrictMode?: boolean;
+    noTypeorm?: boolean;
 };
