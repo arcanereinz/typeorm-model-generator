@@ -269,6 +269,9 @@ function addImportsAndGenerationOptions(
         if (generationOptions.generateBigintTransformer) {
             entity.generateBigintTransformer = true;
         }
+        if (generationOptions.generateValidators) {
+            entity.generateValidators = true;
+        }
     });
     return dbModel;
 }

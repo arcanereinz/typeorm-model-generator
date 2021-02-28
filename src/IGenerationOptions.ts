@@ -20,6 +20,7 @@ export default interface IGenerationOptions {
     generateConstructor: boolean;
     generateTinyintTransformer?: boolean;
     generateBigintTransformer?: boolean;
+    generateValidators?: boolean;
     customNamingStrategyPath: string;
     relationIds: boolean;
     strictMode: "none" | "?" | "!";
@@ -49,6 +50,7 @@ export function getDefaultGenerationOptions(): IGenerationOptions {
         generateConstructor: false,
         generateTinyintTransformer: false,
         generateBigintTransformer: false,
+        generateValidators: false,
         customNamingStrategyPath: "",
         relationIds: false,
         strictMode: "none",

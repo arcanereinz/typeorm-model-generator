@@ -12,6 +12,7 @@ export type Column = {
     default?: string; // ?
     // convert between: bool <=> tinyint(1) <signed|unsigned>
     transformer?: string; // content-type: ValueTransformer | ValueTransformer[];
+    constraints?: string[];
     options: {
         name: string;
         length?: number;

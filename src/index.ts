@@ -282,6 +282,12 @@ function checkYargsParameters(options: options): options {
             describe:
                 "(ONLY MySQL - NOT FOR AUTO-INCREMENT) Generate transformer that converts number <=> bigint <signed|usigned>. Use with caution since this can cause interger overflows. Typeorm does not support transformers on auto-increment columns.",
         },
+        generateValidators: {
+            boolean: true,
+            default: options.generationOptions.generateValidators,
+            describe:
+                "(ONLY MySQL) Generate class-validator constraints based on column properties",
+        },
         disablePluralization: {
             boolean: true,
             default: !options.generationOptions.pluralizeNames,
@@ -348,6 +354,7 @@ function checkYargsParameters(options: options): options {
         argv.generateTinyintTransformer;
     options.generationOptions.generateBigintTransformer =
         argv.generateBigintTransformer;
+    options.generationOptions.generateValidators = argv.generateValidators;
     options.generationOptions.convertCaseEntity = argv.ce as IGenerationOptions["convertCaseEntity"];
     options.generationOptions.convertCaseFile = argv.cf as IGenerationOptions["convertCaseFile"];
     options.generationOptions.convertCaseProperty = argv.cp as IGenerationOptions["convertCaseProperty"];
@@ -622,6 +629,13 @@ async function useInquirer(options: options): Promise<options> {
                                     .generateBigintTransformer,
                         },
                         {
+                            name:
+                                "Generate class-validator constraints based on column properties",
+                            value: "constraints",
+                            checked:
+                                options.generationOptions.generateValidators,
+                        },
+                        {
                             name: "Use specific naming convention",
                             value: "namingConvention",
                             checked:
@@ -714,6 +728,9 @@ async function useInquirer(options: options): Promise<options> {
         );
         options.generationOptions.generateBigintTransformer = customizations.includes(
             "bigintTransformer"
+        );
+        options.generationOptions.generateValidators = customizations.includes(
+            "constraints"
         );
         options.generationOptions.indexFile = customizations.includes("index");
         options.generationOptions.exportType = customizations.includes(

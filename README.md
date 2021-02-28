@@ -93,6 +93,8 @@ Options:
                                    <signed|unsigned>. Use with caution since this can
                                    cause interger overflows. Typeorm does not support
                                    transformers on auto-increment columns.             [boolean] [default: false]
+      --generateValidators         (ONLY MySQL) Generate class-validator constraints
+                                   based on column properties.                         [boolean] [default: false]
       --disablePluralization       Disable pluralization of OneToMany,
                                    ManyToMany relation names                           [boolean] [default: false]
       --skipTables                 Skip schema generation for specific tables.

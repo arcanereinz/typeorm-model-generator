@@ -181,6 +181,7 @@ export default abstract class AbstractDriver {
                 generationOptions.generateTinyintTransformer;
             model.generateBigintTransformer =
                 generationOptions.generateBigintTransformer;
+            model.generateValidators = generationOptions.generateValidators;
         });
         await this.GetCoulmnsFromEntity(
             dbModel,

@@ -324,6 +324,60 @@ export default class MysqlDriver extends AbstractDriver {
                                 : undefined;
                     }
 
+                    /**
+                     * contains calss-validator constraints
+                     */
+                    const constraints: string[] = [];
+                    /**
+                     * matching validator import statement
+                     */
+                    const classValidators = {}; // initialize calssValidatorImport
+                    const isNullable =
+                        resp.IS_NULLABLE === "YES" ? true : false;
+
+                    // enforce required values if no default specified and not auto-increment
+                    if (
+                        !isNullable &&
+                        resp.COLUMN_DEFAULT === null &&
+                        !generated
+                    ) {
+                        classValidators["IsNotEmpty"] = "true";
+                        constraints.push("@IsNotEmpty()");
+                    }
+                    // enforce varchar max lengths
+                    if (
+                        resp.DATA_TYPE === "varchar" &&
+                        resp.CHARACTER_MAXIMUM_LENGTH
+                    ) {
+                        classValidators["MaxLength"] = "true";
+                        constraints.push(
+                            `@MaxLength(${resp.CHARACTER_MAXIMUM_LENGTH})`
+                        );
+                    }
+                    // pull enum values and add to constraints
+                    if (resp.DATA_TYPE === "enum") {
+                        classValidators["IsIn"] = "true";
+                        constraints.push(
+                            `@IsIn([${resp.COLUMN_TYPE.substring(
+                                5,
+                                resp.COLUMN_TYPE.length - 1
+                            )}])`
+                        );
+                    }
+                    // add optional flag if there is any constraints and the column is nullable
+                    if (isNullable && constraints.length) {
+                        classValidators["IsOptional"] = "true";
+                        constraints.push("@IsOptional()");
+                    }
+
+                    // add common entity validator import
+                    if (Object.keys(classValidators).length) {
+                        ent.classValidators = {
+                            ...ent.classValidators, // can be null/undefined
+                            ...classValidators,
+                        };
+                    }
+
                     ent.columns.push({
                         generated,
                         type: columnType,
@@ -332,6 +386,7 @@ export default class MysqlDriver extends AbstractDriver {
                         options,
                         tscName,
                         tscType,
+                        constraints, // add constraints based on constraints
                     });
                 });
         });
