@@ -117,7 +117,10 @@ function readTOMLConfig(
         loadedConnectionOptions &&
         loadedGenerationOptions &&
         Object.keys(loadedConnectionOptions).length ===
-            Object.keys(options.connectionOptions).length &&
+            // fix mysql bug where instance option exists on
+            // options.connectionOptions but not on loadedConnectionOptions
+            Object.keys(removeUndefinedKeys(options.connectionOptions))
+                .length &&
         Object.keys(loadedGenerationOptions).length ===
             Object.keys(options.generationOptions).length;
 
@@ -873,4 +876,23 @@ async function useInquirer(options: options): Promise<options> {
         console.log(`[${new Date().toLocaleTimeString()}] Config file saved.`);
     }
     return options;
+}
+
+/**
+ * Removes keys from object where value is undefined
+ *
+ * @param object Object of key value pairs
+ */
+function removeUndefinedKeys(object: Record<string, any>) {
+    // remove undefined keys
+    return Object.entries(object)
+        .filter(([, value]: [string, any]) => value !== undefined) // filter out undefined values
+        .reduce(
+            // reconstruct object
+            (clauses, [key, value]) => ({
+                ...clauses,
+                [key]: value,
+            }),
+            {}
+        );
 }
