@@ -68,16 +68,18 @@ function makeDefaultConfigs() {
 function readTOMLConfig(
     options: options
 ): { options; fullConfigFile: boolean } {
-    if (!fs.existsSync(path.resolve(process.cwd(), ".tomg-config"))) {
+    if (!fs.existsSync(path.resolve(process.cwd(), ".toml-config.json"))) {
         return { options, fullConfigFile: false };
     }
     console.log(
         `[${new Date().toLocaleTimeString()}] Using configuration file. [${path.resolve(
             process.cwd(),
-            ".tomg-config"
+            ".toml-config.json"
         )}]`
     );
-    const retVal = fs.readJsonSync(path.resolve(process.cwd(), ".tomg-config"));
+    const retVal = fs.readJsonSync(
+        path.resolve(process.cwd(), ".toml-config.json")
+    );
     const [loadedGenerationOptions, loadedConnectionOptions] = retVal;
 
     let hasUnknownProperties = false;
@@ -189,7 +191,7 @@ function checkYargsParameters(options: options): options {
             string: true,
             default: options.connectionOptions.schemaNames.join(","),
             describe:
-                "Schema name to create model from. Only for mssql and postgres. You can pass multiple values separated by comma eg. -s scheme1,scheme2,scheme3",
+                "Schema name to create model from. Only for mssql and postgres. You can pass multiple values separated by comma, no spaces eg. -s scheme1,scheme2,scheme3",
         },
         i: {
             alias: "instance",
@@ -301,7 +303,7 @@ function checkYargsParameters(options: options): options {
             boolean: true,
             default: options.generationOptions.noTypeorm,
             describe:
-                "(ONLY MySQL) Do not include typeorm imports and decorators when writing out typescript files. For use with --generateValidators",
+                "(ONLY MySQL) Omit typeorm imports and decorators when writing out typescript files. For use with --generateValidators",
         },
         disablePluralization: {
             boolean: true,
@@ -313,13 +315,13 @@ function checkYargsParameters(options: options): options {
             string: true,
             default: options.connectionOptions.skipTables.join(","),
             describe:
-                "Skip schema generation for specific tables. You can pass multiple values separated by comma",
+                "Skip schema generation for specific tables. You can pass multiple values separated by comma, no spaces",
         },
         tables: {
             string: true,
             default: options.connectionOptions.onlyTables.join(","),
             describe:
-                "Generate specific tables. You can pass multiple values separated by comma",
+                "Generate specific tables. You can pass multiple values separated by comma, no spaces",
         },
         strictMode: {
             choices: ["none", "?", "!"],
@@ -472,7 +474,7 @@ async function useInquirer(options: options): Promise<options> {
             {
                 default: options.connectionOptions.databaseNames.join(","),
                 message:
-                    "Database name: (You can pass multiple values separated by comma)",
+                    "Database name: (You can pass multiple values separated by comma, no spaces)",
                 name: "dbName",
                 type: "input",
             },
@@ -488,7 +490,7 @@ async function useInquirer(options: options): Promise<options> {
                             ","
                         ),
                         message:
-                            "Database schema: (You can pass multiple values separated by comma)",
+                            "Database schema: (You can pass multiple values separated by comma, no spaces)",
                         name: "schema",
                         type: "input",
                     },
@@ -541,7 +543,7 @@ async function useInquirer(options: options): Promise<options> {
         "Ignore specific tables": async () => {
             const { tableNames } = await inquirer.prompt({
                 default: options.connectionOptions.skipTables.join(","),
-                message: "Table names(separated by comma)",
+                message: "Table names(separated by comma, no spaces)",
                 name: "tableNames",
                 type: "input",
             });
@@ -550,7 +552,7 @@ async function useInquirer(options: options): Promise<options> {
         "Select specific tables": async () => {
             const { tableNames } = await inquirer.prompt({
                 default: options.connectionOptions.onlyTables.join(","),
-                message: "Table names(separated by comma)",
+                message: "Table names(separated by comma, no spaces)",
                 name: "tableNames",
                 type: "input",
             });
@@ -595,7 +597,7 @@ async function useInquirer(options: options): Promise<options> {
                             checked: options.generationOptions.lazy,
                         },
                         {
-                            name: "Generate cascade relations",
+                            name: "(ONLY MySQL) Generate cascade relations",
                             value: "cascade",
                             checked: options.generationOptions.cascade,
                         },
@@ -631,7 +633,7 @@ async function useInquirer(options: options): Promise<options> {
                         },
                         {
                             name:
-                                "Generate transformer that converts boolean <=> tinyint(1) <signed|unsigned>",
+                                "(ONLY MySQL) Generate transformer that converts boolean <=> tinyint(1) <signed|unsigned>",
                             value: "tinyintTransformer",
                             checked:
                                 options.generationOptions
@@ -639,7 +641,7 @@ async function useInquirer(options: options): Promise<options> {
                         },
                         {
                             name:
-                                "Generate transformer that converts number <=> bigint <signed|unsigned>",
+                                "(ONLY MySQL - NOT FOR AUTO-INCREMENT) Generate transformer that converts number <=> bigint <signed|unsigned>",
                             value: "bigintTransformer",
                             checked:
                                 options.generationOptions
@@ -647,20 +649,20 @@ async function useInquirer(options: options): Promise<options> {
                         },
                         {
                             name:
-                                "Generate class-validator constraints based on column properties",
+                                "(ONLY MySQL) Generate class-validator constraints based on column properties",
                             value: "constraints",
                             checked:
                                 options.generationOptions.generateValidators,
                         },
                         {
                             name:
-                                "Add optional chaining (?.) to property type that are nullable or has default or is auto-increment or foreign key",
+                                "(ONLY MySQL) Add optional chaining (?.) to property type that are nullable or has default or is auto-increment or foreign key",
                             value: "smartStrictMode",
                             checked: options.generationOptions.smartStrictMode,
                         },
                         {
                             name:
-                                "Do not include typeorm imports and decorators when writing out typescript files. For use with --generateValidators",
+                                "(ONLY MySQL) Omit typeorm imports and decorators when writing out typescript files. For use with --generateValidators",
                             value: "noTypeorm",
                             checked: options.generationOptions.noTypeorm,
                         },
@@ -859,7 +861,7 @@ async function useInquirer(options: options): Promise<options> {
     ]);
     if (saveConfig === "Yes, with connection details") {
         await fs.writeJson(
-            path.resolve(process.cwd(), ".tomg-config"),
+            path.resolve(process.cwd(), ".toml-config.json"),
             [options.generationOptions, options.connectionOptions],
             { spaces: 2 }
         );
@@ -869,7 +871,7 @@ async function useInquirer(options: options): Promise<options> {
         );
     } else if (saveConfig === "Yes, only model customization options") {
         await fs.writeJson(
-            path.resolve(process.cwd(), ".tomg-config"),
+            path.resolve(process.cwd(), ".toml-config.json"),
             [options.generationOptions],
             { spaces: 2 }
         );

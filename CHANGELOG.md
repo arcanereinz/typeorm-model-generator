@@ -41,7 +41,7 @@
 * Custom NamingStrategy is now defined as separate functions instead of a class
 * Rework how parameters are passed to the library:
     - Utilization of partial config files
-    - Option to save .tomg-config file without connection options
+    - Option to save .toml-config.json file without connection options
 * Generation of separate fields for primary columns which are used in relations(old approach won't be compatible with typeorm@0.3.0)
 * Remove timeout parameter - query timeout is now set by default to 1 hr
 * Change default case conversions for generated files (#196)

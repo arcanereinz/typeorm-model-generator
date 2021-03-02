@@ -25,5 +25,5 @@ typings.json
 dist/test/
 .eslintrc.js
 .eslintignore
-.tomg-config
+.toml-config.json
 .github/

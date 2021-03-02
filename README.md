@@ -36,6 +36,8 @@ Supported db engines:
 
 - added comment at top of class that shows source schema.table_name and options for generating classes
 
+- rename .tomg-config to .toml-config.json
+
 - **WARNING:** Use `--generateBigintTransformer` with caution since this can cause 32-bit/53-bit overflows when coverting to/from 64-bit integers. 
 
 - **NOTE:** TypeORM tranformers cannot be used on auto-increment columns therefore it is not generated for identity columns.
@@ -106,9 +108,9 @@ Options:
       --smartStrictMode            (ONLY MySQL) add optional chaining to property type
                                    if nullable or has default or is auto-increment or
                                    foreign key                                         [boolean] [default: false]
-      --noTypeorm                  (ONLY MySQL) Do not include typeorm imports and
-                                   decorators when writing out typescript files.
-                                   For use with --generateValidators                   [boolean] [default: false]
+      --noTypeorm                  (ONLY MySQL) Omit typeorm imports and decorators
+                                   when writing out typescript files. For use with
+                                   --generateValidators                                [boolean] [default: false]
       --disablePluralization       Disable pluralization of OneToMany,
                                    ManyToMany relation names                           [boolean] [default: false]
       --skipTables                 Skip schema generation for specific tables.

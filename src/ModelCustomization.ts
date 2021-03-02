@@ -243,7 +243,10 @@ function addImportsAndGenerationOptions(
                 if (!relation.relationOptions) {
                     relation.relationOptions = {};
                 }
-                if (generationOptions.cascade === "true") {
+                if (
+                    generationOptions.cascade === "true" || // from argument input
+                    generationOptions.cascade === true // from toml
+                ) {
                     relation.relationOptions.cascade = true;
                 } else {
                     relation.relationOptions.cascade = generationOptions.cascade
